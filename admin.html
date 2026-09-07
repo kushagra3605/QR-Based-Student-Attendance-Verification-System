@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin - QR Control</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        min-height: 100vh;
+        background: radial-gradient(circle at top left, #a855f7, #0f172a);
+        color: #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .app {
+        width: 100%;
+        max-width: 1100px;
+        padding: 24px;
+      }
+
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+      }
+
+      .topbar a {
+        color: #e5e7eb;
+        text-decoration: none;
+        font-weight: 700;
+        opacity: 0.9;
+      }
+
+      .card {
+        background: rgba(15, 23, 42, 0.95);
+        border-radius: 18px;
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.7);
+        padding: 20px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        gap: 18px;
+      }
+
+      @media (max-width: 900px) {
+        .card {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      h1 {
+        font-size: 1.4rem;
+        margin-bottom: 8px;
+      }
+
+      p.sub {
+        color: #9ca3af;
+        font-size: 0.92rem;
+        margin-bottom: 12px;
+      }
+
+      .panel {
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        border-radius: 14px;
+        padding: 14px;
+        background: radial-gradient(circle at top, #111827, #020617);
+      }
+
+      label {
+        font-size: 0.8rem;
+        color: #9ca3af;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+
+      input {
+        width: 100%;
+        margin-top: 6px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        background: rgba(15, 23, 42, 0.9);
+        color: #e5e7eb;
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      button {
+        border: none;
+        cursor: pointer;
+        border-radius: 999px;
+        padding: 10px 16px;
+        font-size: 0.92rem;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: transform 0.1s ease, filter 0.15s ease;
+      }
+
+      button:active {
+        transform: translateY(1px) scale(0.99);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #a855f7, #3b82f6);
+        color: #0b1120;
+      }
+
+      .btn-danger {
+        background: linear-gradient(135deg, #ef4444, #f59e0b);
+        color: #0b1120;
+      }
+
+      .btn-secondary {
+        background: rgba(15, 23, 42, 0.9);
+        color: #e5e7eb;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+      }
+
+      .status {
+        margin-top: 10px;
+        font-size: 0.9rem;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        background: rgba(2, 6, 23, 0.7);
+        min-height: 42px;
+      }
+
+      .list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-height: 520px;
+        overflow: auto;
+        padding-right: 6px;
+      }
+
+      .item {
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        border-radius: 14px;
+        padding: 10px 12px;
+        background: rgba(2, 6, 23, 0.55);
+      }
+
+      .item strong {
+        color: #f9fafb;
+      }
+
+      .meta {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        color: #9ca3af;
+        font-size: 0.82rem;
+        margin-top: 4px;
+      }
+
+      .actions {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <div class="topbar">
+        <a href="./index.html">← Back</a>
+        <div class="actions">
+          <button type="button" id="clearCheckedAll" class="btn-danger">
+            Reset all scanned
+          </button>
+          <button type="button" id="clearGeneratedAll" class="btn-danger">
+            Clear all generated
+          </button>
+        </div>
+      </div>
+
+      <section class="card">
+        <div class="panel">
+          <h1>Admin Controls</h1>
+          <p class="sub">
+            Generate QR (one-time), view scanned list, and reset a student to be
+            scanned again.
+          </p>
+
+          <div class="row">
+            <div>
+              <label for="adminName">Name</label>
+              <input id="adminName" type="text" placeholder="e.g. Aman Kumar" />
+            </div>
+            <div>
+              <label for="adminEnroll">Enrollment</label>
+              <input id="adminEnroll" type="text" placeholder="e.g. 23BCS0123" />
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="button" id="adminGenerate" class="btn-primary">
+              Generate QR (one-time)
+            </button>
+            <button type="button" id="adminDownload" class="btn-secondary" style="display: none">
+              Download
+            </button>
+            <button type="button" id="adminOpenScanner" class="btn-secondary">
+              Open Scanner
+            </button>
+          </div>
+
+          <div class="status" id="adminStatus">Ready.</div>
+
+          <div id="adminQrWrap" style="margin-top: 14px; display: none; justify-content: center">
+            <div
+              id="adminQrcode"
+              style="
+                width: 220px;
+                height: 220px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 18px;
+                background: radial-gradient(circle at top left, #111827, #020617);
+                border: 1px solid rgba(55, 65, 81, 0.8);
+              "
+            ></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h1>Scanned (Checked) List</h1>
+          <p class="sub" id="checkedCount">0 scanned</p>
+          <div class="list" id="checkedList"></div>
+        </div>
+      </section>
+    </main>
+
+    <!-- QRCode.js CDN (needed to actually render the generated QR) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="auth.js"></script>
+    <script src="data.js"></script>
+    <script src="admin.js"></script>
+  </body>
+</html>
+
+

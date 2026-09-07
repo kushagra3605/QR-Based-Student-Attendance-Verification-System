@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QR Generator - Name & Enrollment</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle at top left, #3b82f6, #0f172a);
+        color: #0f172a;
+      }
+
+      .app {
+        width: 100%;
+        max-width: 900px;
+        padding: 24px;
+      }
+
+      .card {
+        background: rgba(15, 23, 42, 0.95);
+        border-radius: 18px;
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.7);
+        padding: 24px;
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) minmax(0, 1.5fr);
+        gap: 24px;
+        color: #e5e7eb;
+      }
+
+      @media (max-width: 720px) {
+        .card {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      .card-left h1 {
+        font-size: 1.9rem;
+        font-weight: 700;
+        color: #f9fafb;
+        margin-bottom: 6px;
+      }
+
+      .card-left p.sub {
+        font-size: 0.95rem;
+        color: #9ca3af;
+        margin-bottom: 18px;
+      }
+
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+
+      label {
+        font-size: 0.85rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+        color: #9ca3af;
+      }
+
+      input {
+        width: 100%;
+        margin-top: 4px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        background: rgba(15, 23, 42, 0.9);
+        color: #f9fafb;
+        font-size: 0.95rem;
+        outline: none;
+        transition: border 0.15s ease, box-shadow 0.15s ease, background 0.15s;
+      }
+
+      input::placeholder {
+        color: #6b7280;
+      }
+
+      input:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.6);
+        background: rgba(15, 23, 42, 1);
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 6px;
+      }
+
+      button {
+        border: none;
+        cursor: pointer;
+        border-radius: 999px;
+        padding: 10px 20px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: transform 0.1s ease, box-shadow 0.1s ease,
+          background 0.15s ease;
+      }
+
+      button:active {
+        transform: translateY(1px) scale(0.99);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #3b82f6, #22c55e);
+        color: #0b1120;
+        box-shadow: 0 14px 30px rgba(34, 197, 94, 0.4);
+      }
+
+      .btn-primary:hover {
+        filter: brightness(1.05);
+      }
+
+      .btn-secondary {
+        background: rgba(15, 23, 42, 0.9);
+        color: #e5e7eb;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+      }
+
+      small.help {
+        display: block;
+        margin-top: 4px;
+        font-size: 0.78rem;
+        color: #6b7280;
+      }
+
+      .status {
+        margin-top: 10px;
+        min-height: 18px;
+        font-size: 0.86rem;
+      }
+
+      .status.error {
+        color: #fecaca;
+      }
+
+      .status.ok {
+        color: #bbf7d0;
+      }
+
+      .card-right {
+        border-radius: 14px;
+        background: radial-gradient(circle at top, #1f2937, #020617);
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        padding: 18px 16px 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .qr-header {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #9ca3af;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+      }
+
+      .qr-preview-wrap {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+      }
+
+      #qrcode {
+        width: 220px;
+        height: 220px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 18px;
+        background: radial-gradient(circle at top left, #111827, #020617);
+        border: 1px solid rgba(55, 65, 81, 0.8);
+        box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.9);
+      }
+
+      #qrcode.empty::after {
+        content: "QR will appear here";
+        font-size: 0.8rem;
+        color: #6b7280;
+      }
+
+      .qr-meta {
+        width: 100%;
+        text-align: center;
+        font-size: 0.8rem;
+        color: #9ca3af;
+      }
+
+      .qr-meta strong {
+        color: #e5e7eb;
+      }
+
+      .footer {
+        margin-top: 10px;
+        font-size: 0.78rem;
+        text-align: center;
+        color: #9ca3af;
+      }
+
+      /* Side menu */
+      .menu-btn {
+        position: fixed;
+        top: 18px;
+        left: 18px;
+        z-index: 50;
+        background: rgba(15, 23, 42, 0.9);
+        color: #e5e7eb;
+        border: 1px solid rgba(148, 163, 184, 0.4);
+        padding: 10px 14px;
+        border-radius: 999px;
+        font-weight: 700;
+      }
+
+      .drawer-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.55);
+        z-index: 60;
+        display: none;
+      }
+
+      .drawer {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: min(320px, 86vw);
+        background: rgba(2, 6, 23, 0.98);
+        border-right: 1px solid rgba(148, 163, 184, 0.35);
+        z-index: 70;
+        transform: translateX(-105%);
+        transition: transform 0.18s ease;
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .drawer.open {
+        transform: translateX(0);
+      }
+
+      .drawer h2 {
+        font-size: 1.05rem;
+        color: #f9fafb;
+      }
+
+      .drawer .nav {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 8px;
+      }
+
+      .drawer a.nav-item,
+      .drawer button.nav-item {
+        width: 100%;
+        text-align: left;
+        background: rgba(15, 23, 42, 0.9);
+        color: #e5e7eb;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        padding: 12px 12px;
+        border-radius: 14px;
+        font-weight: 700;
+      }
+
+      .drawer .hint {
+        margin-top: auto;
+        color: #9ca3af;
+        font-size: 0.78rem;
+        line-height: 1.35;
+      }
+    </style>
+  </head>
+  <body>
+    <button class="menu-btn" id="openMenuBtn" type="button">☰ Menu</button>
+    <div class="drawer-overlay" id="drawerOverlay"></div>
+    <aside class="drawer" id="drawer">
+      <h2>Navigation</h2>
+      <div class="nav">
+        <a class="nav-item" href="./index.html">Registration (QR Generator)</a>
+        <button class="nav-item" type="button" id="scannerLinkBtn">
+          Scanner 
+        </button>
+        <button class="nav-item" type="button" id="adminLinkBtn">
+          Admin 
+        </button>
+      </div>
+      <div class="hint">
+        Scanner is protected with a password. After unlocking, it stays unlocked
+        only for this tab/window session. If you close it and come back, you'll
+        be asked again.
+      </div>
+    </aside>
+    <main class="app">
+      <section class="card">
+        <div class="card-left">
+          <h1>Generate QR for Students</h1>
+          <p class="sub">
+            Enter the student name and enrollment number to instantly generate a
+            unique QR code.
+          </p>
+          <p class="sub" style="margin-top: -8px">
+            <a href="./scan.html" style="color: #93c5fd; text-decoration: none; font-weight: 700">
+             
+            </a>
+          </p>
+
+          <form id="qrForm">
+            <div>
+              <label for="studentName">Full Name</label>
+              <input
+                type="text"
+                id="studentName"
+                placeholder="e.g. Aman Kumar"
+                autocomplete="off"
+              />
+            </div>
+
+            <div>
+              <label for="enrollment">Enrollment Number</label>
+              <input
+                type="text"
+                id="enrollment"
+                placeholder="e.g. 23BCS0123"
+                autocomplete="off"
+              />
+              <small class="help">
+                The QR will be generated from a secure combination of name &
+                enrollment.
+              </small>
+            </div>
+
+            <div class="actions">
+              <button type="submit" class="btn-primary">
+                Generate QR
+              </button>
+              <button type="button" id="resetBtn" class="btn-secondary">
+                Clear
+              </button>
+            </div>
+
+            <div id="status" class="status"></div>
+          </form>
+        </div>
+
+        <div class="card-right">
+          <div class="qr-header">
+            <span>Student QR</span>
+            <button
+              type="button"
+              id="downloadBtn"
+              class="btn-secondary"
+              style="padding-inline: 14px; font-size: 0.8rem; display: none"
+            >
+              Download
+            </button>
+          </div>
+
+          <div class="qr-preview-wrap">
+            <div id="qrcode" class="empty"></div>
+          </div>
+
+          <div class="qr-meta" id="qrMeta">No data yet.</div>
+        </div>
+      </section>
+
+      <p class="footer">
+        Works fully in-browser. No data is stored on any server.
+      </p>
+    </main>
+
+    <!-- QRCode.js CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="auth.js"></script>
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

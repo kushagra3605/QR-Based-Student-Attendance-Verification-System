@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QR Scanner - Check In</title>
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+        min-height: 100vh;
+        background: radial-gradient(circle at top left, #22c55e, #0f172a);
+        color: #e5e7eb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .app {
+        width: 100%;
+        max-width: 980px;
+        padding: 24px;
+      }
+
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+      }
+
+      .topbar a {
+        color: #e5e7eb;
+        text-decoration: none;
+        font-weight: 600;
+        opacity: 0.9;
+      }
+
+      .card {
+        background: rgba(15, 23, 42, 0.95);
+        border-radius: 18px;
+        box-shadow: 0 24px 60px rgba(15, 23, 42, 0.7);
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 1.6rem;
+        margin-bottom: 6px;
+      }
+
+      p.sub {
+        color: #9ca3af;
+        font-size: 0.92rem;
+        margin-bottom: 12px;
+      }
+
+      .panel {
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        border-radius: 14px;
+        padding: 14px;
+        background: radial-gradient(circle at top, #111827, #020617);
+      }
+
+      .row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      button {
+        border: none;
+        cursor: pointer;
+        border-radius: 999px;
+        padding: 10px 16px;
+        font-size: 0.92rem;
+        font-weight: 700;
+        letter-spacing: 0.02em;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: transform 0.1s ease, filter 0.15s ease;
+      }
+
+      button:active {
+        transform: translateY(1px) scale(0.99);
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #22c55e, #3b82f6);
+        color: #0b1120;
+      }
+
+      .btn-secondary {
+        background: rgba(15, 23, 42, 0.9);
+        color: #e5e7eb;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+      }
+
+      .status {
+        margin-top: 10px;
+        font-size: 0.9rem;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        background: rgba(2, 6, 23, 0.7);
+        min-height: 42px;
+      }
+
+      .status.ok {
+        border-color: rgba(34, 197, 94, 0.6);
+        background: rgba(34, 197, 94, 0.12);
+      }
+      .status.warn {
+        border-color: rgba(234, 179, 8, 0.6);
+        background: rgba(234, 179, 8, 0.12);
+      }
+      .status.err {
+        border-color: rgba(239, 68, 68, 0.6);
+        background: rgba(239, 68, 68, 0.12);
+      }
+
+      #reader {
+        width: 100%;
+      }
+
+      /* upload section removed (camera-only) */
+
+      .footer {
+        margin-top: 12px;
+        color: #9ca3af;
+        font-size: 0.78rem;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <div class="topbar">
+        <a href="./index.html">← Back to Generator</a>
+      </div>
+
+      <section class="card">
+        <h1>Scan & Check</h1>
+        <p class="sub">
+          Scan using your camera. Each enrollment is marked “checked” only once.
+        </p>
+
+        <div class="panel">
+          <div class="row">
+            <button type="button" id="startBtn" class="btn-primary">
+              Start camera scan
+            </button>
+            <button type="button" id="stopBtn" class="btn-secondary" disabled>
+              Stop
+            </button>
+          </div>
+
+          <div class="status" id="status">
+            Ready. Click “Start camera scan”.
+          </div>
+
+          <div style="margin-top: 12px">
+            <div id="reader"></div>
+          </div>
+        </div>
+      </section>
+
+      <p class="footer">
+        Stored locally in this browser (localStorage). If you open in another
+        browser/device, the checked list won’t sync.
+      </p>
+    </main>
+
+    <!-- html5-qrcode CDN -->
+    <script src="https://unpkg.com/html5-qrcode@2.3.10/html5-qrcode.min.js"></script>
+    <script src="auth.js"></script>
+    <script src="data.js"></script>
+    <script src="scan.js"></script>
+  </body>
+</html>
+
